@@ -1,4 +1,4 @@
-name: Publish Extension
+dname: Publish Extension
 
 on:
   release:
@@ -67,11 +67,6 @@ jobs:
 
       - name: Checkout tag
         run: git checkout ${GITHUB_REF#refs/tags/}
-
-      - name: Make sure version isn't odd
-        run: |
-          cd extensions/vscode
-          node scripts/versionCheck.js
 
       # 2. Install npm dependencies
       - name: Use Node.js from .nvmrc
@@ -222,18 +217,3 @@ jobs:
           pattern: "*-vsix"
           path: vsix-artifacts
           merge-multiple: true
-
-      # 2. Publish the extension to VS Code Marketplace
-      - name: Publish to VS Code Marketplace
-        run: |
-          cd extensions/vscode
-          npx vsce publish --packagePath ../../vsix-artifacts/*.vsix
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
-
-      # 3. Publish the extension to Open VSX Registry
-      - name: Publish (Open VSX Registry)
-        continue-on-error: true
-        run: |
-          cd extensions/vscode
-          npx ovsx publish -p ${{ secrets.VSX_REGISTRY_TOKEN }} --packagePath ../../vsix-artifacts/*.vsix
